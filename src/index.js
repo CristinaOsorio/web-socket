@@ -7,37 +7,34 @@ const app = express();
 const server = http.createServer(app);
 const io = new WebSocketServer(server);
 
-let notes = [
-  { title: "Note 1", description: "Lorem 1", id: "1" },
-  { title: "Note 2", description: "Lorem 2", id: "2" },
-  { title: "Note 3", description: "Lorem 3", id: "3" },
-  { title: "Note 4", description: "Lorem 4", id: "4" },
-];
+let notes = [];
 
 app.use(express.static(__dirname + "/public"));
 
 io.on("connection", (socket) => {
   console.log("Nueva Conexion:", socket.id);
 
-  io.emit("server:loadnotes", notes);
+  io.emit("server:load_notes", notes);
 
-  socket.on("client:newnote", (newNote) => {
+  socket.on("client:new_note", (newNote) => {
     const note = { ...newNote, id: uuid() };
     notes.push(note);
-    io.emit("server:newnotes", note);
+    io.emit("server:new_note", note);
+    socket.broadcast.emit("server:new_note_notification", note);
   });
 
-  socket.on("client:deletenote", (id) => {
+  socket.on("client:delete_note", (id) => {
     notes = notes.filter((note) => note.id !== id);
-    io.emit("server:loadnotes", notes);
+    io.emit("server:load_notes", notes);
+    socket.broadcast.emit("server:delete_note_notification");
   });
 
-  socket.on("client:getnote", (id) => {
+  socket.on("client:get_note", (id) => {
     const note = notes.find((note) => note.id === id);
-    socket.emit("server:selectednote", note);
+    socket.emit("server:selected_note", note);
   });
 
-  socket.on("client:updatenote", (updatedNote) => {
+  socket.on("client:update_note", (updatedNote) => {
     notes.map((note) => {
       if (note.id == updatedNote.id) {
         note.title = updatedNote.title;
@@ -45,7 +42,8 @@ io.on("connection", (socket) => {
         return note;
       }
     });
-    io.emit("server:loadnotes", notes);
+    socket.broadcast.emit("server:update_note_notification", updatedNote);
+    io.emit("server:load_notes", notes);
   });
 });
 

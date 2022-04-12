@@ -9,5 +9,6 @@ noteForm.addEventListener("submit", (e) => {
     : saveNote(title.value, description.value);
   title.value = "";
   description.value = "";
+  noteID = "";
   title.focus();
 });
