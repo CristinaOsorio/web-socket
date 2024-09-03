@@ -5,11 +5,11 @@ This is a simple CRUD web application in real-time using Socket.io and Nodejs
 ### Instalation
 
 ```
-git clone https://github.com/CristinaOsorio/crud-socket-node.git
+git clone [https://github.com/CristinaOsorio/crud-socket-node.git](https://github.com/CristinaOsorio/web-socket.git)
 ```
 
 ```
-cd websockets
+cd web-socket
 ```
 
 ```
